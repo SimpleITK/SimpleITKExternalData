@@ -1,0 +1,15 @@
+version: 2
+jobs:
+  test:
+    docker:
+     - image: circleci/python:2.7-stretch
+    steps:
+      - checkout
+      - run:
+          command: |
+            .circleci/ValidateContent.sh $(pwd)
+workflows:
+  version: 2
+  test:
+    jobs:
+      - test
