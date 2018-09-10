@@ -25,9 +25,26 @@ die() {
   echo "$@" 1>&2; exit 1
 }
 
+do_fixup=false
+object_store=""
+help=false
 
-if test $# -lt 1 || test "$1" = "-h" || test "$1" = "--help"; then
-  die "Usage: $0 <ExternalData_OBJECT_STORES path>"
+while [[ $# -gt 0 ]] ;
+do
+    opt="$1";
+    shift;
+    case "$opt" in
+        "-h"|"--help")
+           help=true;;
+        "--fixup" )
+           do_fixup=true;;
+        *) if test "${object_store}" = "" ; then object_store=$opt; else echo >&2 "Invalid option: $opt"; exit 1; fi;;
+   esac
+done
+
+
+if test "${object_store}" = "" || $help; then
+  die "Usage: $0 <ExternalData_OBJECT_STORES path> [--fixup]"
 fi
 
 if ! type md5sum > /dev/null; then
@@ -37,8 +54,6 @@ if ! type sha512sum > /dev/null; then
   die "Please install the sha512sum executable."
 fi
 
-
-object_store=$1
 cd ${object_store}
 
 
@@ -71,7 +86,12 @@ verify_and_create() {
     object_alt_algo_file_hash=$(${alt_algo}sum "${object_file}" | cut -f 1 -d ' ')
     echo "Checking for ${object_alt_algo_file_hash}..."
     if test ! -e "${object_store}/${alt_algo_upper}/${object_alt_algo_file_hash}"; then
-        die "${alt_algo} object file for ${object_store}/${algo_upper}/${file_hash} does not exist!"
+        if $do_fixup; then
+            echo "Creating ${alt_algo_upper}/${object_alt_algo_file_hash}."
+            cp "${object_file}" "${object_store}/${alt_algo_upper}/${object_alt_algo_file_hash}"
+        else
+            die "${alt_algo} object file for ${object_store}/${algo_upper}/${file_hash} does not exist!"
+        fi
     fi
   done || exit 1
 }
