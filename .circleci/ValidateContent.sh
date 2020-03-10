@@ -82,22 +82,24 @@ verify_and_create() {
       die "${algo} for ${object_store}/${algo_upper}/${file_hash} does not equal hash of file (${object_file_hash})!"
     fi
 
-    
-    object_alt_algo_file_hash=$(${alt_algo}sum "${object_file}" | cut -f 1 -d ' ')
-    echo "Checking for ${object_alt_algo_file_hash}..."
-    if test ! -e "${object_store}/${alt_algo_upper}/${object_alt_algo_file_hash}"; then
-        if $do_fixup; then
-            echo "Creating ${alt_algo_upper}/${object_alt_algo_file_hash}."
-            cp "${object_file}" "${object_store}/${alt_algo_upper}/${object_alt_algo_file_hash}"
-        else
-            die "${alt_algo} object file for ${object_store}/${algo_upper}/${file_hash} does not exist!"
+
+    if [ ! -z "$alt_algo"]; then
+        object_alt_algo_file_hash=$(${alt_algo}sum "${object_file}" | cut -f 1 -d ' ')
+        echo "Checking for ${object_alt_algo_file_hash}..."
+        if test ! -e "${object_store}/${alt_algo_upper}/${object_alt_algo_file_hash}"; then
+            if $do_fixup; then
+                echo "Creating ${alt_algo_upper}/${object_alt_algo_file_hash}."
+                cp "${object_file}" "${object_store}/${alt_algo_upper}/${object_alt_algo_file_hash}"
+            else
+                die "${alt_algo} object file for ${object_store}/${algo_upper}/${file_hash} does not exist!"
+            fi
         fi
     fi
   done || exit 1
 }
 
 verify_and_create md5 sha512
-verify_and_create sha512 md5
+verify_and_create sha512
 
 echo ""
 echo "Verification completed successfully."
