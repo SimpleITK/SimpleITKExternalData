@@ -83,7 +83,7 @@ verify_and_create() {
     fi
 
 
-    if [ ! -z "$alt_algo"]; then
+    if [ ! -z "$alt_algo" ]; then
         object_alt_algo_file_hash=$(${alt_algo}sum "${object_file}" | cut -f 1 -d ' ')
         echo "Checking for ${object_alt_algo_file_hash}..."
         if test ! -e "${object_store}/${alt_algo_upper}/${object_alt_algo_file_hash}"; then
