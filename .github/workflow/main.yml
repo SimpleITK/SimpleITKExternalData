@@ -1,0 +1,17 @@
+name: Validate Content
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Running Validate Content
+      run: |
+        .github/scripts/ValidateContent.sh $(pwd)
