@@ -8,7 +8,7 @@ on:
 
 env:
   region: us-east-1
-  bucket: luwe-test00
+  bucket: luwe-test01
 jobs:
   sync:
     name: Sync simpleitk-scratch bucket
