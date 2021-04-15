@@ -32,4 +32,4 @@ jobs:
 #         role-skip-session-tagging: true
     - name: Push scripts to S3
       run: |
-        aws s3 sync . s3://${{ env.bucket }}/public --delete --exclude "*" --include "MD5" --include "SHA512"
+        aws s3 sync . s3://${{ env.bucket }}/public --delete --exclude "*" --include "MD5/*" --include "SHA512/*"
