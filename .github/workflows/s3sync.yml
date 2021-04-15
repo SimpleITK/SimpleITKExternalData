@@ -1,0 +1,35 @@
+name: Sync S3
+
+on:
+  push:
+    branches:
+      - main123
+  workflow_dispatch:
+
+env:
+  region: us-east-1
+  bucket: luwe-test00
+jobs:
+  sync:
+    name: Sync simpleitk-scratch bucket
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install awscli
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.region }}
+        role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+        role-external-id: ${{ secrets.AWS_ROLE_EXTERNAL_ID }}
+        role-duration-seconds: 1200
+        role-session-name: svc-simpleitk
+        role-skip-session-tagging: true
+    - name: Push scripts to S3
+      run: |
+        aws s3 sync . s3://${{ env.bucket }}/public --delete --recursive --exclude "*" --include "MD5" --include "SHA512"
