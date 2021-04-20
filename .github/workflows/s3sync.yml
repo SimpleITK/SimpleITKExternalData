@@ -8,7 +8,7 @@ on:
 
 env:
   region: us-east-1
-  bucket: luwe-test01
+  bucket: luwe-test02
 jobs:
   sync:
     name: Sync simpleitk bucket
@@ -25,11 +25,11 @@ jobs:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ env.region }}
-#         role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-#         role-external-id: ${{ secrets.AWS_ROLE_EXTERNAL_ID }}
-#         role-duration-seconds: 1200
-#         role-session-name: svc-simpleitk
-#         role-skip-session-tagging: true
+        role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+        role-external-id: ${{ secrets.AWS_ROLE_EXTERNAL_ID }}
+        role-duration-seconds: 1200
+        role-session-name: svc-simpleitk
+        role-skip-session-tagging: true
     - name: Push MD5 and SHA512 to S3
       run: |
         aws s3 sync . s3://${{ env.bucket }}/public --exclude "*" --include "MD5/*" --include "SHA512/*"
