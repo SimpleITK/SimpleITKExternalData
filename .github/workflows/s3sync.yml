@@ -1,0 +1,45 @@
+name: Sync to S3
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+env:
+  region: us-east-1
+  bucket: simpleitk
+jobs:
+  sync:
+    name: Sync simpleitk bucket
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install awscli
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.region }}
+        role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+        role-external-id: ${{ secrets.AWS_ROLE_EXTERNAL_ID }}
+        role-duration-seconds: 1200
+        role-session-name: svc-simpleitk
+        role-skip-session-tagging: true
+    - name: Push MD5 and SHA512 to S3 simpleitk
+      run: |
+        aws s3 sync . s3://${{ env.bucket }}/public --exclude "*" --include "MD5/*" --include "SHA512/*"
+
+    - name: Verify ./MD5
+      run: |
+        find ./MD5 -type f | wc -l
+        aws s3 ls --summarize --human-readable --recursive s3://${{ env.bucket }}/public/MD5 | grep Total
+        
+    - name: Verify ./SHA512
+      run: |
+        find ./SHA512 -type f | wc -l
+        aws s3 ls --summarize --human-readable --recursive s3://${{ env.bucket }}/public/SHA512 | grep Total
