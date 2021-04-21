@@ -3,12 +3,12 @@ name: Sync to S3
 on:
   push:
     branches:
-      - main123
+      - master
   workflow_dispatch:
 
 env:
   region: us-east-1
-  bucket: luwe-test02
+  bucket: simpleitk
 jobs:
   sync:
     name: Sync simpleitk bucket
@@ -30,7 +30,7 @@ jobs:
         role-duration-seconds: 1200
         role-session-name: svc-simpleitk
         role-skip-session-tagging: true
-    - name: Push MD5 and SHA512 to S3
+    - name: Push MD5 and SHA512 to S3 simpleitk
       run: |
         aws s3 sync . s3://${{ env.bucket }}/public --exclude "*" --include "MD5/*" --include "SHA512/*"
 
