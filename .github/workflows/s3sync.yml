@@ -32,7 +32,7 @@ jobs:
         role-skip-session-tagging: true
     - name: Push MD5 and SHA512 to S3 simpleitk
       run: |
-        aws s3 sync . s3://${{ env.bucket }}/public --exclude "*" --include "MD5/*" --include "SHA512/*"
+        aws s3 sync . s3://${{ env.bucket }}/public --exclude "*" --include "MD5/*" --include "SHA512/*" --size-only
 
     - name: Verify ./MD5
       run: |
